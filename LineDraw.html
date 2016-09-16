@@ -1,0 +1,78 @@
+<html>
+<head>
+<script>
+var isMouseDown = false;
+var previousWasMouseDown = false;
+var allMyPoints = new Array();
+var firstPoints = new Array();  // first point when mouse down
+
+function getMousePos(canvas, evt) 
+{
+    var rect = canvas.getBoundingClientRect();
+    return {
+      x: evt.clientX - rect.left,
+      y: evt.clientY - rect.top
+	   };
+}
+
+function MouseDown()
+{
+  isMouseDown = true;
+}
+
+function MouseUp()
+{
+  isMouseDown = false;
+}
+
+function drawLines(c, e)
+{
+  if (isMouseDown != true)
+  {
+    previousWasMouseDown = false;
+    return;
+  }
+
+  // find out the mouse position x, y
+  var point = getMousePos(c, e);
+  var x = point.x;
+  var y = point.y;
+
+  var p = {xpos : x, ypos : y};
+
+  if (previousWasMouseDown == false)
+  {
+    firstPoints.push(p);
+  }
+
+  allMyPoints.push(p);
+
+  var ctx = c.getContext("2d");
+  ctx.beginPath();
+  var fp = allMyPoints[0];
+  ctx.moveTo(fp.xpos, fp.ypos);
+
+  var idx;
+  var skipIdx = 0;
+  for (idx = 0; idx < allMyPoints.length; idx++)
+  {  
+     if (allMyPoints[idx] == firstPoints[skipIdx])
+     {
+       var cp = allMyPoints[idx];
+       ctx.moveTo(cp.xpos, cp.ypos);
+       skipIdx++;
+     }
+
+     var cp = allMyPoints[idx];
+     ctx.lineTo(cp.xpos, cp.ypos);
+     ctx.moveTo(cp.xpos, cp.ypos);
+  }
+  ctx.stroke();
+  previousWasMouseDown = true;
+}
+</script>
+</head>
+<body>
+<canvas id="myCanvas" width="400" height="600" onmousemove="drawLines(this, event)" onmousedown="MouseDown()" onmouseup="MouseUp()" ></canvas>
+</body>
+</html>
